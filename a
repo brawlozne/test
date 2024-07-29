@@ -1,1 +1,77 @@
+function strPtr(message) {
+    var charPtr = malloc(message.length + 1);
+    Memory.writeUtf8String(charPtr, message);
+    return charPtr
+}
 
+function createStringObject(mmmdmskads) {
+    var land = strPtr(mmmdmskads);
+    let pesocheck = malloc(128);
+    StringCtor(pesocheck, land);
+    return pesocheck;
+}
+
+function sendDebugAction(action) {
+    var messageBuffer = malloc(7 + 4);
+    Buffer._setEncodingLength(messageBuffer, 4);
+    Buffer._setMessageType(messageBuffer, 10777);
+    Buffer._setMessageVersion(messageBuffer, 0);
+    messageBuffer.add(7).writeInt(action);
+    libc_send(cache.fd, messageBuffer, 7 + 4, 0);
+    free(messageBuffer);
+}
+
+const CumButton = new NativeFunction(base.add(0x289FA8), 'int', []);
+
+function createDebugButton() {
+    const base = Process.findModuleByName('libg.so').base;
+    const StageAdd = new NativeFunction(base.add(STAGE_ADD_CHILD), 'void', ['pointer', 'pointer']);
+    const StageRemove = new NativeFunction(base.add(STAGE_REMOVE_CHILD), 'void', ['pointer', 'pointer']);
+    const AddFile = new NativeFunction(base.add(ADD_FILE), 'int', ['pointer', 'pointer', 'int', 'int', 'int', 'int', 'int']);
+    const fSetText = new NativeFunction(base.add(SET_TEXT), 'void', ['pointer', 'pointer', 'bool']);
+    const StringCtor = new NativeFunction(base.add(STRING_CTOR), 'void', ['pointer', 'pointer']);
+    const adder = Interceptor.attach(base.add(ADD_FILE), {
+        onEnter: function(args) {
+            adder.detach();
+            AddFile(args[0], strPtr("sc/debug.sc"), -1, -1, -1, -1, 0);
+        }
+    });
+    let btn = malloc(700);
+    new NativeFunction(base.add(0x5F3600), 'void', ['pointer'])(btn);
+    let movieClip = new NativeFunction(base.add(0x10E874), 'pointer', ['pointer', 'pointer', 'bool'])(strPtr("sc/debug.sc"), strPtr("debug_button"), 1);
+    new NativeFunction(base.add(0x1F7CDC), 'void', ['pointer', 'pointer'])(btn, movieClip);
+
+    StageAdd(base.add(stage_offset).readPointer(), btn);
+    new NativeFunction(base.add(0x2BAC08), 'void', ['pointer', 'float', 'float'])(btn, 30, 560);
+    fSetText(btn, createStringObject("D"));
+
+    let debug = malloc(600);
+    new NativeFunction(base.add(0x5F3600), 'void', ['pointer'])(debug);
+    let movieCliper = new NativeFunction(base.add(0x10E874), 'pointer', ['pointer', 'pointer', 'bool'])(strPtr("sc/debug.sc"), strPtr("debug_menu"), 1);
+    new NativeFunction(base.add(0x1F7CDC), 'void', ['pointer', 'pointer'])(debug, movieCliper);
+
+    new NativeFunction(base.add(0x61718), 'void', ['pointer', 'float', 'float'])(debug, 700, 0);
+
+    let close = malloc(500);
+    new NativeFunction(base.add(0x5F3600), 'void', ['pointer'])(close);
+    let movieCliperrrrrr = new NativeFunction(base.add(0x10E874), 'pointer', ['pointer', 'pointer', 'bool'])(strPtr("sc/debug.sc"), strPtr("debug_button"), 0);
+    new NativeFunction(base.add(0x1F7CDC), 'void', ['pointer', 'pointer'])(close, movieCliperrrrrr);
+
+    new NativeFunction(base.add(0x61718), 'void', ['pointer', 'float', 'float'])(close, 30, 560);
+    fSetText(close, createStringObject("D"));
+
+    let gems = malloc(500);
+    new NativeFunction(base.add(0x5F3600), 'void', ['pointer'])(gems);
+    let movieCliperrrrrrr = new NativeFunction(base.add(0x10E874), 'pointer', ['pointer', 'pointer', 'bool'])(strPtr("sc/debug.sc"), strPtr("debug_menu_item"), 0);
+    new NativeFunction(base.add(0x1F7CDC), 'void', ['pointer', 'pointer'])(gems, movieCliperrrrrrr);
+
+    new NativeFunction(base.add(0x61718), 'void', ['pointer', 'float', 'float'])(gems, 900, 160);
+    fSetText(gems, createStringObject("Add Gems"));
+
+    let cummode = malloc(600);
+    new NativeFunction(base.add(0x5F3600), 'void', ['pointer'])(cummode);
+    let movieCliperr = new NativeFunction(base.add(0x10E874), 'pointer', ['pointer', 'pointer', 'bool'])(strPtr("sc/debug.sc"), strPtr("debug_menu_item"), 0);
+    new NativeFunction(base.add(0x1F7CDC), 'void', ['pointer', 'pointer'])(cummode, movieCliperr);
+
+    new NativeFunction(base.add(0x61718), 'void', ['pointer', 'float', 'float'])(cummode, 900, 100);
+    fSetText(cummode, createStringObject("Next Camera Mode"));
